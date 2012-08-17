@@ -55,7 +55,6 @@ public interface LegacyService extends Service {
 	/** Gets the EventService associated with this LegacyService. */
 	EventService getEventService();
 
-	/** Gets the PluginService associated with this LegacyService. */
 	PluginService getPluginService();
 
 	/** Gets the OptionsService associated with this LegacyService. */

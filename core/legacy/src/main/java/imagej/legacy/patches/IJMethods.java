@@ -53,6 +53,7 @@ public class IJMethods {
 
 	/** Appends {@link IJ#showProgress(double)}. */
 	public static void showProgress(final DefaultLegacyService legacyService, final double progress) {
+		if (legacyService.isLegacyMode()) return;
 		// approximate progress as int ratio
 		final int currentIndex = (int) (PROGRESS_GRANULARITY * progress);
 		final int finalIndex = PROGRESS_GRANULARITY;
@@ -63,6 +64,7 @@ public class IJMethods {
 	public static void
 		showProgress(final DefaultLegacyService legacyService, final int currentIndex, final int finalIndex)
 	{
+		if (legacyService.isLegacyMode()) return;
 		Log.debug("showProgress: " + currentIndex + "/" + finalIndex);
 		// report progress through global event mechanism
 		final StatusService statusService = ImageJ.get(StatusService.class);
@@ -72,6 +74,7 @@ public class IJMethods {
 
 	/** Appends {@link IJ#showStatus(String)}. */
 	public static void showStatus(final DefaultLegacyService legacyService, final String s) {
+		if (legacyService.isLegacyMode()) return;
 		Log.debug("showStatus: " + s);
 		if (legacyService == null || !legacyService.isInitialized()) {
 			// suppress ImageJ1 bootup messages

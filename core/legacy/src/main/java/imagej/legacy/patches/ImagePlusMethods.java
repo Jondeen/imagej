@@ -59,7 +59,9 @@ public final class ImagePlusMethods {
 		if (obj == null) return;
 		if (!obj.isProcessor()) return;
 		if (obj.getWindow() == null) return;
-		Log.debug("ImagePlus.updateAndDraw(): " + obj);
+		if (!legacyService.isLegacyMode()) {
+			Log.debug("ImagePlus.updateAndDraw(): " + obj);
+		}
 		legacyService.legacyImageChanged(obj);
 		// TODO - add here too?
 		//WindowManager.setCurrentWindow(obj.getWindow());
@@ -69,7 +71,9 @@ public final class ImagePlusMethods {
 	public static void repaintWindow(final DefaultLegacyService legacyService, final ImagePlus obj) {
 		if (obj == null) return;
 		if (obj.getWindow() == null) return;
-		Log.debug("ImagePlus.repaintWindow(): " + obj);
+		if (!legacyService.isLegacyMode()) {
+			Log.debug("ImagePlus.repaintWindow(): " + obj);
+		}
 		legacyService.legacyImageChanged(obj);
 		// TODO - add here too?
 		//WindowManager.setCurrentWindow(obj.getWindow());
@@ -80,13 +84,16 @@ public final class ImagePlusMethods {
 		@SuppressWarnings("unused") final String message)
 	{
 		if (obj == null) return;
-		Log.debug("ImagePlus.show(): " + obj);
+		if (legacyService.isLegacyMode()) {
+			Log.debug("ImagePlus.show(): " + obj);
+		}
 		legacyService.legacyImageChanged(obj);
 		WindowManager.setCurrentWindow(obj.getWindow());
 	}
 
 	/** Appends {@link ImagePlus#hide()}. */
 	public static void hide(final DefaultLegacyService legacyService, final ImagePlus obj) {
+		if (legacyService.isLegacyMode()) return;
 		if (obj == null) return;
 		Log.debug("ImagePlus.hide(): " + obj);
 		LegacyOutputTracker.getOutputImps().remove(obj);

@@ -127,6 +127,9 @@ public final class DefaultLegacyService extends AbstractService implements
 	/** Method of synchronizing IJ2 & IJ1 options. */
 	private OptionsSynchronizer optionsSynchronizer;
 
+	/** Legacy ImageJ 1.x mode: stop synchronizing */
+	private boolean legacyIJ1Mode;
+
 	// -- LegacyService methods --
 
 	@Override
@@ -305,6 +308,18 @@ public final class DefaultLegacyService extends AbstractService implements
 	}
 
 	// -- helpers --
+
+	/**
+	 * States whether we're running in legacy ImageJ 1.x mode.
+	 * 
+	 * To support workflows which are incompatible with ImageJ2, we want to allow
+	 * users to run in legacy ImageJ 1.x mode, where the ImageJ2 GUI is hidden and
+	 * the ImageJ 1.x GUI is shown. During this time, no synchronisation should take
+	 * place.
+	 */
+	public boolean isLegacyMode() {
+		return legacyIJ1Mode;
+	}
 
 	/**
 	 * Returns the legacy service associated with the ImageJ 1.x instance in the current class loader.

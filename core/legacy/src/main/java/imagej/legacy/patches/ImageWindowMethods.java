@@ -56,7 +56,9 @@ public final class ImageWindowMethods {
 
 	/** Replaces {@link ImageWindow#setVisible(boolean)}. */
 	public static void setVisible(final DefaultLegacyService legacyService, final ImageWindow obj, final boolean visible) {
-		Log.debug("ImageWindow.setVisible(" + visible + "): " + obj);
+		if (!legacyService.isLegacyMode()) {
+			Log.debug("ImageWindow.setVisible(" + visible + "): " + obj);
+		}
 		if (!visible) return;
 		legacyService.legacyImageChanged(obj.getImagePlus());
 		// TODO - not sure this is correct. Does setVisible(true) imply that it
@@ -67,6 +69,7 @@ public final class ImageWindowMethods {
 
 	/** Replaces {@link ImageWindow#show()}. */
 	public static void show(final DefaultLegacyService legacyService, final ImageWindow obj) {
+		if (legacyService.isLegacyMode()) return;
 		setVisible(legacyService, obj, true);
 	}
 
