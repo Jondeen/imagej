@@ -105,4 +105,9 @@ public interface LegacyService extends Service {
 	 */
 	void syncColors();
 
+	/**
+	 * Switch to/from running legacy ImageJ 1.x.
+	 */
+	void toggleLegacyMode(boolean toggle);
+
 }
