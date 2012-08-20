@@ -51,9 +51,11 @@ import imagej.legacy.translate.ImageTranslator;
 import imagej.legacy.translate.LegacyUtils;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -158,6 +160,18 @@ public class LegacyImageMap {
 		return imp;
 	}
 
+	private Set<ImagePlus> legacyModeImages = new HashSet<ImagePlus>();
+	public void toggleLegacyMode(boolean toggle) {
+		if (toggle) {
+			legacyModeImages.clear();
+		} else {
+			for (final ImagePlus imp : legacyModeImages) {
+				registerLegacyImage(imp);
+			}
+			legacyModeImages.clear();
+		}
+	}
+
 	/**
 	 * Ensures that the given legacy image has a corresponding
 	 * {@link ImageDisplay}.
@@ -167,6 +181,10 @@ public class LegacyImageMap {
 	 *         {@link ImageTranslator}.
 	 */
 	public ImageDisplay registerLegacyImage(final ImagePlus imp) {
+		if (legacyService.isLegacyMode()) {
+			legacyModeImages.add(imp);
+			return null;
+		}
 		ImageDisplay display = lookupDisplay(imp);
 		if (display == null) {
 			// mapping does not exist; mirror legacy image to display
@@ -203,7 +221,10 @@ public class LegacyImageMap {
 	 * @return a collection of legacy {@link ImagePlus} instances linked to {@link ImageDisplay} instances.
 	 */
 	public Collection<ImagePlus> getImagePlusInstances() {
-		return displayTable.keySet();
+		Collection<ImagePlus> result = new HashSet<ImagePlus>();
+		result.addAll(displayTable.keySet());
+		result.addAll(legacyModeImages);
+		return result;
 	}
 
 	// -- Helper methods --
