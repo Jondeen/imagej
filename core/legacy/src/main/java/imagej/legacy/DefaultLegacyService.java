@@ -40,6 +40,7 @@ import ij.ImagePlus;
 import ij.Menus;
 import ij.WindowManager;
 import ij.gui.ImageWindow;
+import ij.plugin.PlugIn;
 import imagej.command.CommandService;
 import imagej.core.options.OptionsMisc;
 import imagej.data.Dataset;
@@ -73,11 +74,12 @@ import imagej.util.ColorRGB;
 
 import java.awt.Menu;
 import java.awt.MenuItem;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
 
 /**
  * Default service for working with legacy ImageJ 1.x.
@@ -364,24 +366,42 @@ public final class DefaultLegacyService extends AbstractService implements
 		pluginService.addPlugins(plugins);
 	}
 
+	private static LegacyService legacyServiceToRestart;
+	public static class RestartIJ2Plugin implements PlugIn {
+		@Override
+		public void run(String arg) {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						legacyServiceToRestart.toggleLegacyMode(false);
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public synchronized void toggleLegacyMode(boolean toggle) {
-		legacyIJ1Mode = toggle;
+		if (toggle) legacyIJ1Mode = toggle;
 
 		final ij.ImageJ ij = IJ.getInstance();
 
 		// inject Help>Stop Legacy ImageJ 1.x Mode
 		final String menuLabel = "Stop Legacy ImageJ 1.x Mode";
-		final MenuItem item = new MenuItem(menuLabel);
-		final Menu helpMenu = Menus.getMenuBar().getHelpMenu();
-		item.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-				toggleLegacyMode(false);
-				helpMenu.remove(item);
-				}
-				});
-		helpMenu.add(item);
+		@SuppressWarnings("unchecked")
+		final Hashtable<String, String> commands = Menus.getCommands();
+		if (!commands.containsKey(menuLabel)) {
+			final Menu helpMenu = Menus.getMenuBar().getHelpMenu();
+			final MenuItem item = new MenuItem(menuLabel);
+			item.addActionListener(ij);
+			helpMenu.add(item);
+
+			commands.put(menuLabel, RestartIJ2Plugin.class.getName());
+		}
+		legacyServiceToRestart = this;
 
 		// TODO: prevent IJ1 from quitting without IJ2 quitting, too
 
@@ -411,6 +431,8 @@ public final class DefaultLegacyService extends AbstractService implements
 			final ImageWindow window = imp.getWindow();
 			if (window != null) window.setVisible(toggle);
 		}
+
+		if (!toggle) legacyIJ1Mode = toggle;
 	}
 
 	/* 3-1-12
