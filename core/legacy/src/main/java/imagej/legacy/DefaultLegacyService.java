@@ -119,7 +119,7 @@ public final class DefaultLegacyService extends AbstractService implements
 	private MenuService menuService;
 
 	private boolean lastDebugMode;
-	private boolean initialized;
+	private static DefaultLegacyService instance;
 
 	/** Mapping between modern and legacy image data structures. */
 	private LegacyImageMap imageMap;
@@ -194,7 +194,7 @@ public final class DefaultLegacyService extends AbstractService implements
 
 	@Override
 	public boolean isInitialized() {
-		return initialized;
+		return instance != null;
 	}
 
 	// TODO - make private only???
@@ -225,6 +225,10 @@ public final class DefaultLegacyService extends AbstractService implements
 
 	@Override
 	public void initialize() {
+		if (instance != null) {
+			throw new UnsupportedOperationException("Cannot instantiate more than one DefaultLegacyService");
+		}
+
 		imageMap = new LegacyImageMap(getContext());
 		optionsSynchronizer = new OptionsSynchronizer(optionsService);
 
@@ -246,7 +250,12 @@ public final class DefaultLegacyService extends AbstractService implements
 
 		subscribeToEvents(eventService);
 
-		initialized = true;
+		synchronized (DefaultLegacyService.class) {
+			if (instance != null) {
+				throw new UnsupportedOperationException("Cannot instantiate more than one DefaultLegacyService");
+			}
+			instance = this;
+		}
 	}
 
 	// -- Event handlers --
