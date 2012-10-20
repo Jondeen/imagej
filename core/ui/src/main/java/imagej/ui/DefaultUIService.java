@@ -274,6 +274,10 @@ public final class DefaultUIService extends AbstractService implements
 		for (final UserInterface ui : uiList) {
 			if (ui.isVisible()) uis.add(ui);
 		}
+		if (uis.size() == 0) {
+			final UserInterface defaultUI = getDefaultUI();
+			if (defaultUI != null) uis.add(defaultUI);
+		}
 		return uis;
 	}
 
